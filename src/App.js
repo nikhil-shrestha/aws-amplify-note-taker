@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API, graphqlOperation } from 'aws-amplify';
 import { withAuthenticator } from 'aws-amplify-react';
 
 import { createNote } from './graphql/mutations';
+import { listNotes } from './graphql/queries';
 
 function App() {
   const [notes, setNotes] = useState([]);
   const [note, setNote] = useState('');
+
+  useEffect(() => {
+    async function loadData() {
+      const { data } = await API.graphql(graphqlOperation(listNotes));
+      setNotes(data.listNotes.items);
+    }
+    loadData();
+  }, []);
 
   const handleChange = (event) => setNote(event.target.value);
   const handleAddNote = async (event) => {
